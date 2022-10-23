@@ -1,4 +1,4 @@
-### Resnet-LLDDM paper implementation
+## Resnet-LLDDM paper implementation
 
 I implement the "ResNet-LDDMM: Advancing the LDDMM Framework using Deep Residual Networks" paper found here: https://arxiv.org/abs/2102.07951. This paper uses specific deep residual networks along with kinetic energy minimisation principles to learn diffeomorphic registrations to a performance they claim is better than other non-deep learning approaches. I implement this paper for reasons of interest in using deep nets as ODE solvers due to the paper's proof of equivalence of resnets to forward-euler schemes with a straightforward way to implement kinetic energy minimisation. Due to the flexibility of neural networks, the full shape morphism can be reconstructed with a learnt net. Below are my notes having read this paper, personal tests, and included in this repo is a full tensorflow code implementation to do your own image registrations with subject to having .obj data and using Chamfer's distance.
 
