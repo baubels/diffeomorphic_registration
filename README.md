@@ -4,10 +4,9 @@ An example:
 
 ![](dense_resnet_correct_LDDMM_flow_paper_specs_1_width_500.gif)
 
-This is a simple (and slightly incomplete) implementation of https://arxiv.org/abs/2102.07951.
+This is an implementation of https://arxiv.org/abs/2102.07951.
 
-This paper introduces neural nets as discrete ODE solvers, and specifically employs one that uses the forward Euler scheme by learning kinetic energy minimising trajectories. In fact, the learnt register is that of LDDMM methods. The resulting learnt network is able to produce a diffeomorphic shape register showing the shapes morphism given a starting and ending frame. My implementation is incomplete as it uses L2 as the data term instead of Earth Mover's or Chamfer's distance. This is due to still implementing Sinkhorn's algorithm.
-
+This paper introduces neural nets as discrete ODE solvers, and specifically employs one that uses the forward Euler scheme by learning kinetic energy minimising trajectories. In fact, the learnt register is that of LDDMM methods. The resulting learnt network is able to produce a diffeomorphic shape register showing the shapes morphism given a starting and ending frame. I implement this with both the L2 loss taking vector coordinates of object points as input, as well as implementing Chamfer's Distance for 3D image inputs and outputs.
 
 My scrapbook notes to this paper now follows:
 
@@ -98,15 +97,29 @@ Here is a diffeomorphism between a smile and a neutral facial expression.
 
 <img src='dense_resnet_correct_LDDMM_flow_paper_specs_1_width_500.gif'>
 
-Tada! Nice and diffeomorphic.
+Tada! Nice and diffeomorphic. 
 
-Some remarks:
+In the above, I end up using the simple L2 norm. The main issue with this is that input and output coordinates for an object must be determined prior to learning the net. This is practically unfeasible since no way would one know, given two (say, scanned) point clouds of an object, where the start and end is without manual labelling or already some other algorithm used to compute these. To avoid this issue, a different loss function is used - one which is invariant to moving the point clouds around arbitrarily. In this case, the loss function is far more versatile in that target point cloud locations don't need specification with respect to input point clouds.
+
+Specifically, with Chamfer's distance, $d_{CD}(.)$:
+
+$$d_{CD}(X, Y) = \sum_{x \in X}\min_{y \in Y} \|x-y\|_2^2 + \sum_{y \in Y}\min_{x \in X} \|x-y\|_2^2$$.
+
+Therefore it's a generalised L2 norm, however running through point clouds X, Y nearest neighbours. Some examples of 3D registrations using this loss:
+
+![](screenshot_hands.png).
+
+![](screenshot_human.png).
+
+
+Seeing the Limitations
 ---
-* I plan on applying this net to more interting data with a beefier computer.
-* Neural net topology itself can be modified to fit arbitrary ODE numerical methods for solving things that require invertibility and diffeomorphic movements.
-* Overfitting isn't a concern here - instead finding a nice tradeoff between the amount of regulariser and data term losses to use is what matters.
-* Changing the loss function to include, perhaps, bone-structure considerations whilst doing diffeomorphisms could yield more accurate results.
-* Taking a low FPS video can be made high FPS by feeding subsequent frames through this framework. This assumes everything in the video is topologically preserved, however!
-* By considering the loss in diffeomorphisms between two shapes, one can use this framework as a classification or anomoly detection scheme in its own right.
-* Width of res blocks determines the ability to finely granulate the underlying space of approximated derivates, allowing for features which are close by to correctly exhibit diffeomorphisms whilst larger, further away objects change correctly in their scale too
-* Reading the paper will give a much better understanding of what's going on!
+Doing more complicated image registrations does come with limitations. In my tests, it's very fiddly to have to find the optimal number of neural network layers and find the optimal weighing parameters. In the prior image, even having tried many alternate parameters and network lengths, the leg of the human isn't registered correctly. For some reason the kinetic energy is minimised by having two legs tie at the knee and switch position. This lack of clarity and precision is quite unfortunate. Due to the diffeomorphic limitations of the net, one further suggestions might be to limit the gradients of each layer manually so that tangling doesn't occur. 
+
+
+Some remarks I find noteworthy:
+---
+* Neural net topology itself can be modified to fit arbitrary ODE numerical methods for solving things that require invertibility and diffeomorphic movements. Forward-euler schemes aren't the only type!
+* Overfitting doesn't exist in this problem, instead, doing the most number of training epochs is the best!
+* Learning the register of two images allows one to have far more data for few samples, improving net generability as a way of data augmentation. Alternatively the loss function could include something like Chamfer's distance between the samples and further their register.
+* Width of res blocks determines the ability to finely granulate the underlying space of approximated derivates.
