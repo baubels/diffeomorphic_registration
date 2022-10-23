@@ -1,14 +1,10 @@
-### Image registration for shapes that match through diffeomorphisms, inspired by LDDMMs and implemented with Neural Networks as ODEs
+### Resnet-LLDDM paper implementation
 
-An example:
+I implement the "ResNet-LDDMM: Advancing the LDDMM Framework using Deep Residual Networks" paper found here: https://arxiv.org/abs/2102.07951. This paper uses specific deep residual networks along with kinetic energy minimisation principles to learn diffeomorphic registrations to a performance they claim is better than other non-deep learning approaches. I implement this paper for reasons of interest in using deep nets as ODE solvers due to the paper's proof of equivalence of resnets to forward-euler schemes with a straightforward way to implement kinetic energy minimisation. Due to the flexibility of neural networks, the full shape morphism can be reconstructed with a learnt net. Below are my notes having read this paper, personal tests, and included in this repo is a full tensorflow code implementation to do your own image registrations with subject to having .obj data and using Chamfer's distance.
 
-![](dense_resnet_correct_LDDMM_flow_paper_specs_1_width_500.gif)
+A taster of what can be generated with an L2 loss:
 
-This is an implementation of https://arxiv.org/abs/2102.07951.
-
-This paper introduces neural nets as discrete ODE solvers, and specifically employs one that uses the forward Euler scheme by learning kinetic energy minimising trajectories. In fact, the learnt register is that of LDDMM methods. The resulting learnt network is able to produce a diffeomorphic shape register showing the shapes morphism given a starting and ending frame. I implement this with both the L2 loss taking vector coordinates of object points as input, as well as implementing Chamfer's Distance for 3D image inputs and outputs.
-
-My scrapbook notes to this paper now follows:
+![](dense_resnet_correct_LDDMM_flow_paper_specs_1_width_500.gif).
 
 The problem statement.
 ---
@@ -103,7 +99,7 @@ In the above, I end up using the simple L2 norm. The main issue with this is tha
 
 Specifically, with Chamfer's distance, $d_{CD}(.)$:
 
-$$d_{CD}(X, Y) = \sum_{x \in X}\min_{y \in Y} \|x-y\|_2^2 + \sum_{y \in Y}\min_{x \in X} \|x-y\|_2^2$$.
+$$d_{CD}(X, Y) = \sum_{x \in X}\min_{y \in Y} \|x-y\|_2^2 + \sum_{y \in Y}\min_{x \in X} \|x-y\|_2^2$$
 
 Therefore it's a generalised L2 norm, however running through point clouds X, Y nearest neighbours. Some examples of 3D registrations using this loss:
 
