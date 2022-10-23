@@ -99,7 +99,7 @@ In the above, I end up using the simple L2 norm. The main issue with this is tha
 
 Specifically, with Chamfer's distance, $d_{CD}(.)$:
 
-$$d_{CD}(X, Y) = \sum_{x \in X}\min_{y \in Y} \|x-y\|_{2}^2 + \sum_{y \in Y}\min_{x \in X} \|x-y\|_{2}^2$$
+$$d_{CD}(X, Y) = \sum_{x \in X}\min_{y \in Y} \lVert x-y \rVert _2^2 + \sum_{y \in Y}\min_{x \in X} \lVert x-y \rVert _2^2$$
 
 Therefore it's a generalised L2 norm, however running through point clouds X, Y nearest neighbours. Some examples of 3D registrations using this loss:
 
